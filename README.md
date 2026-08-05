@@ -13,14 +13,24 @@ End-to-end tests for [saucedemo.com](https://www.saucedemo.com) written in Playw
   - `TC-05` (positive, `@smoke`) — adding a product updates the cart badge and the cart contents,
   - `TC-06` (`@regression`) — adding multiple products increases the badge count,
   - `TC-11` (`@regression`) — removing the last product hides the cart badge.
+- **`tests/e2e/checkout.spec.ts`**
+  - `TC-07` (positive, `@smoke`) — full path: cart → personal info → order overview (product and
+    totals consistent with the cart, `total = subtotal + tax`) → placing the order,
+  - `TC-08` (`@regression`) — continuing without personal info shows a validation error,
+  - `TC-09` (`@regression`) — canceling on the overview step returns to the product list,
+  - `TC-10` (`@regression`) — the downloaded PDF receipt contains the customer details, the
+    product, and the total amount shown on the overview screen.
 
 ## Project structure
 
 ```
-pages/        Page Object Model — BasePage (goto/loginViaCookie/expectLoaded),
-              LoginPage, InventoryPage, CartPage
-fixtures/     base.ts — Playwright fixture (test.extend()): loginPage/inventoryPage/cartPage
-test-data/    users.ts, products.ts — static test data
+pages/        Page Object Model — BasePage (goto/loginViaCookie/expectLoaded) plus
+              LoginPage, InventoryPage, CartPage, CheckoutInfoPage,
+              CheckoutOverviewPage, CheckoutCompletePage
+fixtures/     base.ts — Playwright fixture (test.extend()): loginPage/inventoryPage/cartPage/
+              checkoutInfoPage/checkoutOverviewPage/checkoutCompletePage
+test-data/    users.ts, products.ts, checkout.ts — static test data
+utils/        cart.ts — cart seeding via localStorage (seedCart)
 tests/e2e/    test specifications
 ```
 
@@ -38,9 +48,17 @@ need as a test parameter.
 the login form, then navigates straight to the page's `url`), and a default `expectLoaded()`
 (URL assertion built from `url`, extended in subclasses with additional checks where needed).
 
-`tests/e2e/cart.spec.ts` does not test the login flow, so instead of going through the login form
-it calls `loginViaCookie()` on the target page (`inventoryPage.loginViaCookie()`) and lands
-directly on `/inventory.html`.
+`tests/e2e/cart.spec.ts` and `tests/e2e/checkout.spec.ts` do not test the login flow, so instead
+of going through the login form they call `loginViaCookie()` on the target page
+(`inventoryPage.loginViaCookie()`, `cartPage.loginViaCookie()`) — each lands directly on its own
+`url` with no intermediate hops. `checkout.spec.ts` additionally seeds the cart without clicking
+"Add to cart": `utils/cart.ts` (`seedCart`) injects the `cart-contents` entry into `localStorage`
+via `page.addInitScript()`.
+
+`CheckoutCompletePage.downloadOrderPdfText()` captures the `download` event triggered by the
+"Generate PDF order" button, reads the downloaded file from disk and extracts its text with the
+`pdf-parse` library — this lets `TC-10` verify the actual receipt content, not just the fact that
+a file was downloaded.
 
 ## Test tagging
 
