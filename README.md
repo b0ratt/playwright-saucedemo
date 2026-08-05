@@ -9,13 +9,18 @@ End-to-end tests for [saucedemo.com](https://www.saucedemo.com) written in Playw
     product list,
   - `TC-02`–`TC-04` (negative, `@regression`, data-driven) — wrong password, locked out user
     (`locked_out_user`), empty credentials.
+- **`tests/e2e/cart.spec.ts`**
+  - `TC-05` (positive, `@smoke`) — adding a product updates the cart badge and the cart contents,
+  - `TC-06` (`@regression`) — adding multiple products increases the badge count,
+  - `TC-11` (`@regression`) — removing the last product hides the cart badge.
 
 ## Project structure
 
 ```
-pages/        Page Object Model — BasePage (goto/loginViaCookie/expectLoaded), LoginPage, InventoryPage
-fixtures/     base.ts — Playwright fixture (test.extend()): loginPage/inventoryPage
-test-data/    users.ts — static test data
+pages/        Page Object Model — BasePage (goto/loginViaCookie/expectLoaded),
+              LoginPage, InventoryPage, CartPage
+fixtures/     base.ts — Playwright fixture (test.extend()): loginPage/inventoryPage/cartPage
+test-data/    users.ts, products.ts — static test data
 tests/e2e/    test specifications
 ```
 
@@ -24,14 +29,18 @@ one place does not require editing multiple tests. Selectors are based on `data-
 which are stable and independent of styling or user-visible text.
 
 `fixtures/` contains only actual Playwright fixtures (`test.extend()`) — `base.ts` extends the
-base `test` with ready-made Page Object instances (`loginPage`, `inventoryPage`), so tests never
-construct them manually (`new LoginPage(page)`); they just declare the fixture they need as a
-test parameter.
+base `test` with ready-made Page Object instances (`loginPage`, `inventoryPage`, `cartPage`), so
+tests never construct them manually (`new LoginPage(page)`); they just declare the fixture they
+need as a test parameter.
 
 `pages/BasePage.ts` — every page declares its own `url` and inherits three methods: `goto()`
 (plain navigation), `loginViaCookie()` (injects the `session-username` session cookie, skipping
 the login form, then navigates straight to the page's `url`), and a default `expectLoaded()`
 (URL assertion built from `url`, extended in subclasses with additional checks where needed).
+
+`tests/e2e/cart.spec.ts` does not test the login flow, so instead of going through the login form
+it calls `loginViaCookie()` on the target page (`inventoryPage.loginViaCookie()`) and lands
+directly on `/inventory.html`.
 
 ## Test tagging
 
