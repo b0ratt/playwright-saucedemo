@@ -1,0 +1,41 @@
+{
+  "name": "playwright-saucedemo",
+  "version": "1.0.0",
+  "description": "End-to-end tests for saucedemo.com written in Playwright + TypeScript",
+  "private": true,
+  "scripts": {
+    "test": "playwright test --config=playwright/playwright.config.ts",
+    "test:headed": "playwright test --config=playwright/playwright.config.ts --headed",
+    "test:ui": "playwright test --config=playwright/playwright.config.ts --ui",
+    "test:debug": "playwright test --config=playwright/playwright.config.ts --debug",
+    "test:smoke": "playwright test --config=playwright/playwright.config.ts --grep @smoke",
+    "test:regression": "playwright test --config=playwright/playwright.config.ts --grep @regression",
+    "report": "playwright show-report",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "playwright",
+    "e2e",
+    "saucedemo"
+  ],
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^26.1.2",
+    "eslint": "^10.8.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-playwright": "^2.11.0",
+    "globals": "^17.9.0",
+    "prettier": "^3.9.6",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.66.0"
+  }
+}
